@@ -5,6 +5,6 @@ open System.IO
 [<EntryPoint>]
 let main argv =
     let input = File.ReadAllLines("input.txt", Encoding.UTF8)
-    let output = input |> Day1.solve
+    let output = input |> Day1.solve2
     printfn $"Output: %s{output}"
     0

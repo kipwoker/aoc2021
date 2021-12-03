@@ -16,11 +16,14 @@ type State2 = {
     Aim: int
 }
 
+let private parse =
+    Array.map (fun (x : string) ->
+        let parts = x.Split(' ')
+        { Name = parts.[0]; Value = parts.[1] |> int }
+    )
+
 let solve1 (input: string[]) : string =
-    let commands = input |> Array.map (
-                    fun x ->
-                        let parts = x.Split(' ')
-                        { Name = parts.[0]; Value = parts.[1] |> int})
+    let commands = input |> parse
     let state = commands |> Array.fold (
                     fun state command ->
                         match (command.Name, command.Value) with
@@ -34,10 +37,7 @@ let solve1 (input: string[]) : string =
     result.ToString()
 
 let solve2 (input: string[]) : string =
-    let commands = input |> Array.map (
-                    fun x ->
-                        let parts = x.Split(' ')
-                        { Name = parts.[0]; Value = parts.[1] |> int})
+    let commands = input |> parse
     let state = commands |> Array.fold (
                     fun state command ->
                         match (command.Name, command.Value) with

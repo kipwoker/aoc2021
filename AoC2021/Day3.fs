@@ -52,7 +52,7 @@ let solve2 (input: string[]) : string =
     let data = input |> parse
 
     let oxygen = calculate data (fun (zeroes, ones) -> if ones.Length >= zeroes.Length then (1, ones) else (0, zeroes)) |> toDecimal
-    let carbon = calculate data (fun (zeroes, ones) -> if zeroes.Length <= ones.Length then (0, zeroes) else (1, ones)) |> toDecimal
+    let carbon = calculate data (fun (zeroes, ones) -> if ones.Length >= zeroes.Length then (0, zeroes) else (1, ones)) |> toDecimal
 
     let result = oxygen * carbon
     result.ToString()

@@ -9,20 +9,23 @@ let private parse (input: string[]) : int[][] =
     input |> Array. map (fun x -> x.ToCharArray() |> Array.map (fun y -> if y = '1' then 1 else 0))
 
 //Part1
-let private indexZip (a : int[][]) : int[] =
+let private sumByColumn (a : int[][]) : int[] =
     let n = a.Length
-    let mutable r = Array.init a.[0].Length (fun x -> 0)
+    let m = a.[0].Length
+    let mutable r = Array.init m (fun _ -> 0)
     for i = 0 to n - 1 do
-        for j = 0 to a.[i].Length - 1 do
+        for j = 0 to m - 1 do
             r.[j] <- r.[j] + a.[i].[j]
     r
+
+let private invert = Array.map (fun x -> if x = 0 then 1 else 0)
 
 let solve1 (input: string[]) : string =
     let n = input.Length
     let half = n / 2 + 1
-    let counts = input |> parse |> indexZip |> Array.map (fun x -> if x > half then 1 else 0)
+    let counts = input |> parse |> sumByColumn |> Array.map (fun x -> if x > half then 1 else 0)
     let gamma = counts |> toDecimal
-    let epsilon = counts |> Array.map (fun x -> if x = 0 then 1 else 0) |> toDecimal
+    let epsilon = counts |> invert |> toDecimal
 
     let result = gamma * epsilon
     result.ToString()

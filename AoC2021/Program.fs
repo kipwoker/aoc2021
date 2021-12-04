@@ -1,10 +1,9 @@
-open System.Text
-open Day2
 open System.IO
+open System.Text
 
 [<EntryPoint>]
 let main argv =
-    let input = File.ReadAllLines("input3.txt", Encoding.UTF8)
-    let output = input |> Day3.solve2
+    let input = File.ReadAllLines("input4.txt", Encoding.UTF8)
+    let output = input |> Day4.solve2
     printfn $"Output: %s{output}"
     0

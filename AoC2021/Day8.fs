@@ -53,6 +53,13 @@ let single set =
         printfn $"Expected single element but there are some %A{set}"
         Char.MinValue
 
+// 1111
+//2    6
+//2    6
+// 7777
+//3    5
+//3    5
+// 4444
 let mapLetters (sample : string[]) : Map<char, int> =
     let m = sample |> Array.groupBy (fun x -> x.Length) |> Map.ofArray
     let one = (m |> Map.find 2).[0].ToCharArray() |> Set.ofArray

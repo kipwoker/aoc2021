@@ -58,7 +58,8 @@ let rec getIncompleteScore stack (score : bigint) =
     match stack with
     | [] -> score
     | H :: T ->
-        let newScore = bigint.Multiply(score, 5 |> bigint) + (getIncompleteScore' H)
+        let five = 5 |> bigint
+        let newScore = score * five + (getIncompleteScore' H)
         getIncompleteScore T newScore
 
 let solve1 (input: string[]) : string =

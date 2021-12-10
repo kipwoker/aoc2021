@@ -80,7 +80,7 @@ let solve2 (input: string[]) : string =
                 |> Array.map (fun line -> check line [])
                 |> Array.map(fun state ->
                        match state with
-                       | Incomplete stack -> getIncompleteScore stack (0 |> bigint)
+                       | Incomplete stack -> getIncompleteScore stack zero
                        | _ -> zero
                    )
                 |> Array.filter (fun x -> x > zero)

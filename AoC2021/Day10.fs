@@ -79,7 +79,7 @@ let solve2 (input: string[]) : string =
     let array = input
                 |> parse
                 |> Array.map (fun line -> check line [])
-                |> Array.map(fun state ->
+                |> Array.map (fun state ->
                        match state with
                        | Incomplete stack -> getIncompleteScore stack zero
                        | _ -> zero

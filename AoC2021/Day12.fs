@@ -9,6 +9,12 @@ type Path = {
     Nodes : string list
 }
 
+let toMap keySelector valueSelector collection =
+    collection
+    |> Array.groupBy keySelector
+    |> Array.map (fun (x, y) -> (x, y |> Array.map valueSelector))
+    |> Map.ofArray
+
 let parse (input : string[]) =
     let directions = input |> Array.map (fun line ->
             let parts = line.Split('-')
@@ -18,9 +24,7 @@ let parse (input : string[]) =
 
     Array.concat [directions ; reverseDirections]
     |> Array.filter (fun (x, y) -> x <> "end" && y <> "start")
-    |> Array.groupBy fst
-    |> Array.map (fun (x, y) -> (x, y |> Array.map snd))
-    |> Map.ofArray
+    |> toMap fst snd
 
 let traverseChildren routes node small maxSmall find' =
     routes
@@ -39,7 +43,6 @@ let rec find (routes: Map<string, string[]>) (node: string) (small: Set<string>)
         | (true, _) -> traverseChildren routes node (small.Add n) (maxSmall-1) find
         | (false, _) -> traverseChildren routes node (small.Add n) maxSmall find
     | _ -> traverseChildren routes node small maxSmall find
-
 
 let solve (input: string[]) (maxSmall: int) : string =
     let routes = input |> parse

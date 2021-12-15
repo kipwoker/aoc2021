@@ -24,31 +24,24 @@ let rec dijkstra (a : int[][]) m n (queue: (int*int) list) (risk : int option[,]
         ignore 0
     else
         let queue' = queue |>
-                        List.map (fun (i,j) ->
-                                if visited.Value |> Set.contains (i,j) then
-                                    []
-                                else
-                                    let grid = getGrid m n i j
-                                    let r = risk.[i,j].Value
-                                    grid |> List.iter (fun (x,y) ->
-                                            let current = risk.[x,y]
-                                            let new' = r + a.[x].[y]
-                                            if current.IsNone || current.Value > new' then
-                                                risk.[x,y] <- Some new'
-                                                parents := !parents |> Map.change (x,y) (fun _ -> (i,j) |> Some)
-                                        )
-                                    visited := Set.add (i, j) !visited
-                                    grid
-                            )
-                        |> List.collect id
+                     List.map (fun (i,j) ->
+                             if visited.Value |> Set.contains (i,j) then
+                                 []
+                             else
+                                 let grid = getGrid m n i j
+                                 let r = risk.[i,j].Value
+                                 grid |> List.iter (fun (x,y) ->
+                                         let current = risk.[x,y]
+                                         let new' = r + a.[x].[y]
+                                         if current.IsNone || current.Value > new' then
+                                             risk.[x,y] <- Some new'
+                                             parents := !parents |> Map.change (x,y) (fun _ -> (i,j) |> Some)
+                                     )
+                                 visited := Set.add (i, j) !visited
+                                 grid
+                         )
+                     |> List.collect id
         dijkstra a m n queue' risk visited parents
-
-let rec getPath (parents: Map<(int*int), (int*int)>) (i,j) : (int*int) list =
-    match (i,j) with
-    | (0,0) -> [(i,j)]
-    | _ ->
-        let (x,y) = parents |> Map.find (i,j)
-        getPath parents (x,y) @ [(i,j)]
 
 let traverse (matrix : int[][]) =
     let m = matrix.Length

@@ -3,7 +3,7 @@ open System.Text
 
 [<EntryPoint>]
 let main argv =
-    let input = File.ReadAllLines("input14.txt", Encoding.UTF8)
-    let output = input |> Day14.solve2
+    let input = File.ReadAllLines("input15.txt", Encoding.UTF8)
+    let output = input |> Day15.solve1
     printfn $"Output: %s{output}"
     0

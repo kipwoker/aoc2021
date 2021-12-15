@@ -38,7 +38,7 @@ let rec dijkstra' (a : int[][]) (heap : PriorityQueue<Element>) visited =
         | false ->
             let grid = getGrid m n element.X element.Y
             let visited' = grid
-                            |> List.filter (fun (x,y) -> visited |> Set.contains (x,y) |> not)
+                            |> List.filter (fun pair -> visited |> Set.contains pair |> not)
                             |> List.map (fun (x,y) ->
                                     heap.Insert({ Risk = element.Risk + a.[x].[y]; X = x; Y = y})
                                     (x,y)
@@ -55,13 +55,12 @@ let dijkstra (a : int[][]) =
     dijkstra' a heap visited
 
 let clone count (a: int[][]) =
-    let m = a.Length
-    let n = a.[0].Length
+    let (m, n) = getSizes a
     let m' = m * count
     let n' = n * count
     Array.init m' (fun i ->
         Array.init n' (fun j ->
-            let el = i /m + j / n + a.[i % m].[j % n]
+            let el = i / m + j / n + a.[i % m].[j % n]
             if el >= 10 then (el % 9) + 1 else el
         )
     )

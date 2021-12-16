@@ -124,14 +124,9 @@ let rec calc (node: Node) : bigint =
 let solve input calculator =
     let result = input
                  |> parse
-                 |> Array.map(fun i ->
-                        let node = i |> deserialize
-                        printfn $"%A{node}"
-                        let result' = node |> calculator
-                        printfn $"Result %A{result'}"
-                        result'
-                 ) |> Array.head
-    result.ToString()
+                 |> Array.map(fun i -> i |> deserialize |> calculator)
+                 |> Array.fold (fun state el -> state + el.ToString() + "\n") ""
+    result
 
 let solve1 input = solve input sumVersions
 let solve2 input = solve input calc

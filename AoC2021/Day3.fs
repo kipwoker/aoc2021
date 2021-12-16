@@ -1,9 +1,7 @@
 ﻿module Day3
 
 //Common
-let private toDecimal (bits: int[]) : int =
-    let (_, total') = Array.foldBack (fun el (power, total) -> (power * 2, total + el * power)) bits (1, 0)
-    total'
+open Core
 
 let private parse (input: string[]) : int[][] =
     input |> Array. map (fun x -> x.ToCharArray() |> Array.map (fun y -> if y = '1' then 1 else 0))

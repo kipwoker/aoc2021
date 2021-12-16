@@ -3,6 +3,23 @@
 let inline charToInt c = int c - int '0'
 let inline getSizes<'T> (a : 'T[][]) = (a.Length, a.[0].Length)
 
+let inline toDecimal (bits: int[]) : int =
+    let (_, total') = Array.foldBack (fun el (power, total) -> (power * 2, total + el * power)) bits (1, 0)
+    total'
+
+let inline toDecimal' (bits: char[]) : int =
+    let bits' = bits |> Array.map charToInt
+    let (_, total') = Array.foldBack (fun el (power, total) -> (power * 2, total + el * power)) bits' (1, 0)
+    total'
+
+let inline toBigDecimal (bits: char[]) : bigint =
+    let bits' = bits |> Array.map charToInt
+    let (_, total') = Array.foldBack (fun (el: int) (power : bigint, total : bigint) ->
+                            let el' = bigint el
+                            (power * (bigint 2), total + el' * power)
+                      ) bits' (bigint 1, bigint 0)
+    total'
+
 type PriorityQueue<'T> (capacity : int, comparer: 'T -> 'T -> int) =
     let queue : 'T array = Array.zeroCreate (capacity + 1)
     let mutable N = 0

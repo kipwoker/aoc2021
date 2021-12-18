@@ -24,8 +24,14 @@
         <Compile Include="Day15.fs" />
         <Compile Include="Day16.fs" />
         <Compile Include="Day17.fs" />
+        <Compile Include="Day18.fs" />
         <Compile Include="DayN.fs" />
         <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
+      <PackageReference Include="MathNet.Numerics.FSharp" Version="4.15.0" />
     </ItemGroup>
 
 </Project>

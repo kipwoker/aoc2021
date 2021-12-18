@@ -117,7 +117,6 @@ let sum (left: Tree) (right: Tree) : Tree =
 let rec calcMagnitude (tree: Tree) : int =
     match tree with
     | Leaf leaf -> leaf
-    | Node(Leaf left, Leaf right) -> left * 3 + right * 2
     | Node(left, right) -> (calcMagnitude left) * 3 + (calcMagnitude right) * 2
 
 let solve1 input =

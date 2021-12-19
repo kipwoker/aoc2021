@@ -100,8 +100,7 @@ let rotate rotation point =
     point
     |> toArray
     |> Array.zip rotation
-    |> Array.map (fun (r, coordinate) -> (abs r, coordinate * sign r)
-    )
+    |> Array.map (fun (r, coordinate) -> (abs r, coordinate * sign r))
     |> Array.sortBy fst
     |> Array.map snd
     |> parsePoint
@@ -165,8 +164,11 @@ let findMaxDistance (map : Map<int, Point>) =
     |> Seq.fold(fun max' first -> points |> Seq.fold (fun max'' second -> max max'' (calcDistance first second)) max') -1
 
 let solve input =
-    let scanners = (parse input 0) |> Array.ofList
-    let rotations = generateRotations [| 1 .. 3 |]
-    let map = combine scanners rotations
-    let result = (countBeacons scanners map, findMaxDistance map)
-    result.ToString()
+    let r = (fun () ->
+                let scanners = (parse input 0) |> Array.ofList
+                let rotations = generateRotations [| 1 .. 3 |]
+                let map = combine scanners rotations
+                let result = (countBeacons scanners map, findMaxDistance map)
+                result.ToString()
+            ) |> timeOperation
+    r.ToString()

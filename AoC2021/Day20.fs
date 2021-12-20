@@ -25,50 +25,69 @@ let parse (input: string[]) =
 let getBounds map =
     let minX', maxX', minY', maxY' = map
                                      |> Map.fold (fun (minX, maxX, minY, maxY) (x,y) _ -> (min x minX, max x maxX, min y minY, max y maxY)) (100000, -100000, 100000, -100000)
-    { MinX = minX' - 1; MaxX = maxX' + 1; MinY = minY' - 1; MaxY = maxY' + 1 }
+    let frame = 1
+    { MinX = minX' - frame; MaxX = maxX' + frame; MinY = minY' - frame; MaxY = maxY' + frame }
 
-let calcCell x y map =
-     let delta = [|-1 .. 1|]
-     let binary = delta
-                  |> Array.map (fun i ->
-                      delta |> Array.map (fun j ->
-                         let el = map |> Map.tryFind (i + x, j + y)
-                         if el.IsSome then el.Value else 0
-                      )
-                  )
-                  |> Array.collect id
-     binary |> toDecimal
-
-let enhance' enhancement map =
+let print map =
     let bounds = getBounds map
-    printfn $"%A{bounds}"
+    [bounds.MinX .. bounds.MaxX]
+    |> List.iter (fun i ->
+        [bounds.MinY .. bounds.MaxY]
+        |> List.iter (fun j ->
+            let value = map |> Map.tryFind (i,j)
+            match value with
+            | None -> printf "."
+            | Some 0 -> printf "."
+            | _ -> printf "#"
+        )
+        printfn ""
+    )
+
+let calcCell x y map def =
+     let delta = [|-1 .. 1|]
+     delta |> Array.map (fun i ->
+         delta |> Array.map (fun j ->
+            let el = map |> Map.tryFind (i + x, j + y)
+            if el.IsSome then el.Value else def
+         )
+     )
+     |> Array.collect id
+     |> toDecimal
+
+let enhance' enhancement map def =
+    let bounds = getBounds map
+    //printfn $"%A{bounds}"
     [| bounds.MinX .. bounds.MaxX |]
     |> Array.fold (fun map' x ->
         [| bounds.MinY .. bounds.MaxY |]
         |> Array.fold (fun map'' y ->
-            let idx = calcCell x y map
+            let idx = calcCell x y map def
             let value = Array.get enhancement idx
             let current = map'' |> Map.tryFind (x,y)
             match (current, value) with
-            | None, 0 -> map''
             | None, _ -> map'' |> Map.add (x,y) value
-            | Some _, 0 -> map'' |> Map.remove (x,y)
-            | Some _, _ -> map''
+            | Some _, _ -> map'' |> Map.remove (x,y) |> Map.add (x,y) value
         ) map'
     ) map
 
-let rec enhance enhancement map count =
+let rec enhance enhancement map count def =
+    //print map
     match count with
     | 0 -> map
     | _ ->
-        let map' = enhance' enhancement map
-        enhance enhancement map' (count - 1)
+        let map' = enhance' enhancement map def
+        let def' =
+            if enhancement.[0] = 1 then
+                (if def = 0 then 1 else 0)
+            else
+                0
+        enhance enhancement map' (count - 1) def'
 
 let calcLights map =
     map |> Map.fold (fun sum (_,_) value -> value + sum) 0
 
 let solve input =
     let enhancement, map = input |> parse
-    let map' = enhance enhancement map 2
-    let result = map' |> calcLights
+    let calc count = enhance enhancement map count 0 |> calcLights
+    let result = (calc 2, calc 50)
     result.ToString()

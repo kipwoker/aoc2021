@@ -60,7 +60,7 @@ let rec play1 (a: Player) (b:Player) winScore dice counter =
 
 let calc1 result = result.Loser.Score * result.IterationsCount * 3
 
-let getKey a b counter = (a.Position, b.Position, a.Score, b.Score, counter)
+let getKey a b counter = (a.Position, b.Position, a.Score, b.Score, counter % 2)
 
 let print' a = "Id: " + a.Id.ToString() + " Pos: " + a.Position.ToString() + " Score: " + a.Score.ToString()
 let print (a: Player) (b:Player) counter =
@@ -108,7 +108,6 @@ let solve input =
     let combinations = combinations 1 3 3
                        |> List.groupBy (fun x -> x |> List.sum)
                        |> List.map (fun (x,y) -> {Sum = x; Count = y.Length |> bigint})
-    printfn $"%A{combinations}"
     let task2 = play2 a b 21 cache 0 combinations |> calc2
     let result = (task1, task2)
     result.ToString()

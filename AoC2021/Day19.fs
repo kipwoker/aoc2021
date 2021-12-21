@@ -35,24 +35,6 @@ let rec parse (input: string[]) (num: int) =
         let input' = input |> Array.skip blockSize
         [scanner] @ parse input' (num + 1)
 
-let inline swap array i j =
-    let x = Array.get array i
-    let y = Array.get array j
-    let new' = Array.copy array
-    Array.set new' i y
-    Array.set new' j x
-    new'
-
-let rec permute indexes left =
-    let left' = left + 1
-    let length = Array.length indexes
-    match left' with
-    |  l when l >= length -> [indexes]
-    | _ ->
-        let result = permute indexes left'
-        let result' = [left' .. length - 1] |> List.map (fun i -> permute (swap indexes i left) left') |> List.collect id
-        result @ result'
-
 let generateRotations indexes =
     let axis = [-1; 1]
     permute indexes 0

@@ -2,13 +2,41 @@
 
 open System.Diagnostics
 
+let inline swap array i j =
+    let x = Array.get array i
+    let y = Array.get array j
+    let new' = Array.copy array
+    Array.set new' i y
+    Array.set new' j x
+    new'
+
+let rec permute indexes left =
+    let left' = left + 1
+    let length = Array.length indexes
+    match left' with
+    |  l when l >= length -> [indexes]
+    | _ ->
+        let result = permute indexes left'
+        let result' = [left' .. length - 1] |> List.map (fun i -> permute (swap indexes i left) left') |> List.collect id
+        result @ result'
+
+let rec combinations min' max' size =
+    match size with
+    | 0 -> []
+    | 1 -> [min' .. max'] |> List.map (fun x -> [x])
+    | _ ->
+        let tail = combinations min' max' (size - 1)
+        [min' .. max']
+        |> List.map (fun e -> tail |> List.map (fun t -> [e] @ t))
+        |> List.collect id
+
 type TimedOperation<'T> = {
     ElapsedMilliseconds : int64
     Value : 'T
 }
 
 let timeOperation<'T> (func: unit -> 'T): TimedOperation<'T> =
-    let timer = new Stopwatch()
+    let timer = Stopwatch()
     timer.Start()
     let value = func()
     timer.Stop()
@@ -18,17 +46,17 @@ let inline charToInt c = int c - int '0'
 let inline getSizes<'T> (a : 'T[][]) = (a.Length, a.[0].Length)
 
 let inline toDecimal (bits: int[]) : int =
-    let (_, total') = Array.foldBack (fun el (power, total) -> (power * 2, total + el * power)) bits (1, 0)
+    let _, total' = Array.foldBack (fun el (power, total) -> (power * 2, total + el * power)) bits (1, 0)
     total'
 
 let inline toDecimal' (bits: char[]) : int =
     let bits' = bits |> Array.map charToInt
-    let (_, total') = Array.foldBack (fun el (power, total) -> (power * 2, total + el * power)) bits' (1, 0)
+    let _, total' = Array.foldBack (fun el (power, total) -> (power * 2, total + el * power)) bits' (1, 0)
     total'
 
 let inline toBigDecimal (bits: char[]) : bigint =
     let bits' = bits |> Array.map charToInt
-    let (_, total') = Array.foldBack (fun (el: int) (power : bigint, total : bigint) ->
+    let _, total' = Array.foldBack (fun (el: int) (power : bigint, total : bigint) ->
                             let el' = bigint el
                             (power * (bigint 2), total + el' * power)
                       ) bits' (bigint 1, bigint 0)

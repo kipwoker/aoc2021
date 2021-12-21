@@ -13,6 +13,11 @@ type Result1 = {
     IterationsCount: int
 }
 
+type Group = {
+    Sum: int
+    Count: bigint
+}
+
 let parse (input: string[]) =
     let startPoints = input.[0].Split(' ') |> Array.map int
     (startPoints.[0], startPoints.[1])
@@ -68,7 +73,7 @@ let inline inc (x,y) =
     let inc' t = if t = zero then zero else t + one
     (inc' x, inc' y)
 
-let rec play2 (a: Player) (b:Player) winScore cache counter combinations =
+let rec play2 (a: Player) (b:Player) winScore cache counter (combinations : Group list) =
     let cacheKey = getKey a b counter
     match !cache |> Map.tryFind cacheKey with
     | Some result -> result
@@ -77,18 +82,19 @@ let rec play2 (a: Player) (b:Player) winScore cache counter combinations =
         | a', _ when a'.Score >= winScore -> (one, zero)
         | _, b' when b'.Score >= winScore -> (zero, one)
         | _ ->
+            let isFirst = counter % 2 = 0
             let result = combinations
-                         |> List.map (fun i ->
-                             combinations
-                             |> List.map (fun j ->
-                                 let i' = i |> List.sum
-                                 let j' = j |> List.sum
-                                 play2 (changePosition a i') (changePosition b j') winScore cache (counter + 1) combinations
-                             )
+                         |> List.map (fun g ->
+                             let sum = g.Sum
+                             let count = g.Count
+
+                             let ar,br = if isFirst then
+                                            play2 (changePosition a sum) b winScore cache (counter + 1) combinations
+                                         else
+                                            play2 a (changePosition b sum) winScore cache (counter + 1) combinations
+                             (ar * count, br * count)
                          )
-                         |> List.collect id
                          |> List.fold (fun (a',b') (x,y) -> (a' + x, b' + y)) (zero, zero)
-                         |> inc
             cache := Map.add cacheKey result !cache
             result
 
@@ -97,9 +103,11 @@ let calc2 (a,b) = max a b
 let solve input =
     let aPosition, bPosition = input |> parse
     let a,b = ({Id = 1; Score = 0; Position = aPosition}, {Id = 2; Score = 0; Position = bPosition})
-    let task1 = 0//play1 a b 1000 0 0 |> calc1
+    let task1 = play1 a b 1000 0 0 |> calc1
     let cache = ref Map.empty
     let combinations = combinations 1 3 3
+                       |> List.groupBy (fun x -> x |> List.sum)
+                       |> List.map (fun (x,y) -> {Sum = x; Count = y.Length |> bigint})
     printfn $"%A{combinations}"
     let task2 = play2 a b 21 cache 0 combinations |> calc2
     let result = (task1, task2)

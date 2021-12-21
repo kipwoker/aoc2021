@@ -1,5 +1,6 @@
 ﻿module Day21
 
+open System.Collections.Generic
 open Core
 
 type Player = {
@@ -73,11 +74,8 @@ let inline inc (x,y) =
     let inc' t = if t = zero then zero else t + one
     (inc' x, inc' y)
 
-let rec play2 (a: Player) (b:Player) winScore cache counter (combinations : Group list) =
-    let cacheKey = getKey a b counter
-    match !cache |> Map.tryFind cacheKey with
-    | Some result -> result
-    | None ->
+let rec play2 cache (a: Player) (b:Player) winScore counter (combinations : Group list) =
+    keep cache (fun _ ->
         match (a,b) with
         | a', _ when a'.Score >= winScore -> (one, zero)
         | _, b' when b'.Score >= winScore -> (zero, one)
@@ -89,14 +87,14 @@ let rec play2 (a: Player) (b:Player) winScore cache counter (combinations : Grou
                              let count = g.Count
 
                              let ar,br = if isFirst then
-                                            play2 (changePosition a sum) b winScore cache (counter + 1) combinations
+                                            play2 cache (changePosition a sum) b winScore (counter + 1) combinations
                                          else
-                                            play2 a (changePosition b sum) winScore cache (counter + 1) combinations
+                                            play2 cache a (changePosition b sum) winScore (counter + 1) combinations
                              (ar * count, br * count)
                          )
                          |> List.fold (fun (a',b') (x,y) -> (a' + x, b' + y)) (zero, zero)
-            cache := Map.add cacheKey result !cache
             result
+    ) (getKey a b counter)
 
 let calc2 (a,b) = max a b
 
@@ -104,10 +102,10 @@ let solve input =
     let aPosition, bPosition = input |> parse
     let a,b = ({Id = 1; Score = 0; Position = aPosition}, {Id = 2; Score = 0; Position = bPosition})
     let task1 = play1 a b 1000 0 0 |> calc1
-    let cache = ref Map.empty
     let combinations = combinations 1 3 3
                        |> List.groupBy (fun x -> x |> List.sum)
                        |> List.map (fun (x,y) -> {Sum = x; Count = y.Length |> bigint})
-    let task2 = play2 a b 21 cache 0 combinations |> calc2
+    let d = ref Map.empty
+    let task2 = play2 d a b 21 0 combinations |> calc2
     let result = (task1, task2)
     result.ToString()

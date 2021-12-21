@@ -2,6 +2,15 @@
 
 open System.Diagnostics
 
+let keep cache f =
+  fun x ->
+    match !cache |> Map.tryFind x with
+    | Some v -> v
+    | None ->
+      let v = f x
+      cache := Map.add x v !cache
+      v
+
 let inline swap array i j =
     let x = Array.get array i
     let y = Array.get array j

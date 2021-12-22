@@ -33,7 +33,7 @@ let parse (input : string[]) =
                     | "on" -> On
                     | _ -> Off
         let ranges = parts.[1].Split(',') |> Array.map(fun x -> x.Split('=').[1] |> parseRange)
-        let cuboid = {X = ranges.[0]; Y = ranges.[1]; Z = ranges.[2]}
+        let cuboid = { X = ranges.[0]; Y = ranges.[1]; Z = ranges.[2] }
         { State = state; Cuboid = cuboid }
     )
 

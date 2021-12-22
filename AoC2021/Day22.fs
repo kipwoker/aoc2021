@@ -44,7 +44,7 @@ let inline count c =
     let dz = getLength c.Z
     dx * dy * dz
 
-let inline intersect (a: Cuboid) (b: Cuboid) : Cuboid option =
+let inline intersect a b =
     let cuboid = {
                     X = { Min = max a.X.Min b.X.Min; Max = min a.X.Max b.X.Max }
                     Y = { Min = max a.Y.Min b.Y.Min; Max = min a.Y.Max b.Y.Max }
@@ -55,11 +55,11 @@ let inline intersect (a: Cuboid) (b: Cuboid) : Cuboid option =
     | _ -> Some cuboid
 
 let inline inverse state = if state = On then Off else On
-let apply (commands: Command[]) =
+let apply commands =
     commands
     |> Array.fold (fun result a ->
         let intersected = result
-                          |> List.map (fun (b : Command) -> (b.State, intersect a.Cuboid b.Cuboid))
+                          |> List.map (fun b -> (b.State, intersect a.Cuboid b.Cuboid))
                           |> List.filter (fun (_,y) -> y.IsSome)
                           |> List.map (fun (x,y) -> { State = inverse x; Cuboid = y.Value })
         let lighted = if a.State = On then [a] else []

@@ -37,7 +37,7 @@ let parse (input : string[]) =
         { State = state; Cuboid = cuboid }
     )
 
-let inline getLength range = if range.Max < range.Min then bigint 0 else bigint range.Max - bigint range.Min + bigint 1
+let inline getLength range = max 0 (range.Max - range.Min + 1) |> bigint
 let inline count c =
     let dx = getLength c.X
     let dy = getLength c.Y

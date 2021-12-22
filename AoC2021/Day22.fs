@@ -44,11 +44,14 @@ let inline count c =
     let dz = getLength c.Z
     dx * dy * dz
 
+let inline maximin a b = max a.Min b.Min
+let inline minimax a b = min a.Max b.Max
+
 let inline intersect a b =
     let cuboid = {
-                    X = { Min = max a.X.Min b.X.Min; Max = min a.X.Max b.X.Max }
-                    Y = { Min = max a.Y.Min b.Y.Min; Max = min a.Y.Max b.Y.Max }
-                    Z = { Min = max a.Z.Min b.Z.Min; Max = min a.Z.Max b.Z.Max }
+                    X = { Min = maximin a.X b.X; Max = minimax a.X b.X }
+                    Y = { Min = maximin a.Y b.Y; Max = minimax a.Y b.Y }
+                    Z = { Min = maximin a.Z b.Z; Max = minimax a.Z b.Z }
                  }
     match count cuboid with
     | z when z = bigint 0 -> None

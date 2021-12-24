@@ -52,6 +52,7 @@ let timeOperation<'T> (func: unit -> 'T): TimedOperation<'T> =
     { ElapsedMilliseconds=timer.ElapsedMilliseconds; Value=value }
 
 let inline charToInt c = int c - int '0'
+let inline intToChar c = char(c + int '0')
 let inline getSizes<'T> (a : 'T[][]) = (a.Length, a.[0].Length)
 
 let inline toDecimal (bits: int[]) : int =

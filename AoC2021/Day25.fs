@@ -4,21 +4,6 @@ open Core
 
 type Cucumber = East | South
 
-let print map m n =
-    [0..(m-1)]
-    |> List.iter (fun i ->
-        [0..(n-1)]
-        |> List.iter (fun j ->
-            let el = map |> Map.tryFind (i,j)
-            match el with
-            | Some East -> printf ">"
-            | Some South -> printf "v"
-            | None -> printf "."
-        )
-        printfn ""
-    )
-    printfn ""
-
 let parse (input: string[]) =
     let m = input.Length
     let n = input.[0].Length
@@ -37,44 +22,28 @@ let parse (input: string[]) =
                 |> Map.ofArray
     (map, m, n)
 
+let makeStep map m n cucumber f =
+    [0..(m-1)]
+    |> List.fold (fun map' i ->
+       [0..(n-1)]
+       |> List.fold (fun (map'', movesCount) j ->
+           let el = map |> Map.tryFind (i,j)
+           match el with
+           | Some c when c = cucumber ->
+               let i',j' = f i j
+               let target = map |> Map.tryFind (i', j')
+               match target with
+               | None -> map'' |> Map.add (i', j') c, movesCount + 1
+               | _ -> map'' |> Map.add (i, j) c, movesCount
+           | Some c -> map'' |> Map.add (i, j) c, movesCount
+           | _ -> map'', movesCount
+       ) map'
+    ) (Map.empty, 0)
+
 let rec simulate map m n turnsCount =
-    //print map m n
-    let (eastMap, eastCount) = [0..(m-1)]
-                                |> List.fold (fun map' i ->
-                                    [0..(n-1)]
-                                    |> List.fold (fun (map'', movesCount) j ->
-                                        let el = map |> Map.tryFind (i,j)
-                                        match el with
-                                        | Some East ->
-                                            let j' = (j + 1) % n
-                                            //printfn $"%i{j} %i{j'} %i{n}"
-                                            let target = map |> Map.tryFind (i, j')
-                                            match target with
-                                            | None -> map'' |> Map.add (i, j') East, movesCount + 1
-                                            | _ -> map'' |> Map.add (i, j) East, movesCount
-                                        | Some South -> map'' |> Map.add (i, j) South, movesCount
-                                        | None -> map'', movesCount
-                                    ) map'
-                                ) (Map.empty, 0)
-
-    //print eastMap m n
-
-    let (southMap, totalCount) = [0..(m-1)]
-                                 |> List.fold (fun map' i ->
-                                     [0..(n-1)]
-                                     |> List.fold (fun (map'', movesCount) j ->
-                                         let el = eastMap |> Map.tryFind (i,j)
-                                         match el with
-                                         | Some South ->
-                                             let i' = (i + 1) % m
-                                             let target = eastMap |> Map.tryFind (i', j)
-                                             match target with
-                                             | None -> map'' |> Map.add (i', j) South, movesCount + 1
-                                             | _ -> map'' |> Map.add (i, j) South, movesCount
-                                         | Some East -> map'' |> Map.add (i, j) East, movesCount
-                                         | _ -> map'', movesCount
-                                     ) map'
-                                 ) (Map.empty, eastCount)
+    let eastMap, eastCount =  makeStep map m n East (fun i j -> (i, (j + 1) % n))
+    let southMap, southCount =  makeStep eastMap m n South (fun i j -> ((i + 1) % m, j))
+    let totalCount = eastCount + southCount
 
     if totalCount = 0 then
         turnsCount
@@ -82,6 +51,6 @@ let rec simulate map m n turnsCount =
         simulate southMap m n (turnsCount + 1)
 
 let solve input =
-    let init,m,n = input |> parse
+    let init, m, n = input |> parse
     let result = simulate init m n 1
     result.ToString()

@@ -79,8 +79,6 @@ let findDigits equations =
                                                 |> List.collect id
                         (eq, possibleOptions)
                     )
-    printfn $"%A{ranges}"
-
     let maps = getCombinations ranges Map.empty
     let numbers = maps |> List.map convertToNumber |> List.sort |> Array.ofList
     (numbers |> Array.head, numbers |> Array.last)
